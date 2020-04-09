@@ -9,9 +9,7 @@ class Tile:
         self.rect = pygame.Rect(column, row, 1, 1)
 
 
-columns = 640
-rows = 360
-board = list()
+columns, rows, board = 640, 360, list()
 for y in range(rows):
     row = []
     for x in range(columns):
@@ -22,36 +20,20 @@ for row in board:
         tile.neighbors = list()
         if tile.rect.left != 0:
             tile.neighbors.append(board[tile.rect.top][tile.rect.left - 1])
-        else:
-            tile.neighbors.append(board[tile.rect.top][columns - 1])
         if tile.rect.left != columns - 1:
             tile.neighbors.append(board[tile.rect.top][tile.rect.left + 1])
-        else:
-            tile.neighbors.append(board[tile.rect.top][0])
         if tile.rect.top != 0:
             tile.neighbors.append(board[tile.rect.top - 1][tile.rect.left])
-        else:
-            tile.neighbors.append(board[rows - 1][tile.rect.left])
         if tile.rect.top != rows - 1:
             tile.neighbors.append(board[tile.rect.top + 1][tile.rect.left])
-        else:
-            tile.neighbors.append(board[0][tile.rect.left])
         if tile.rect.left != 0 and tile.rect.top != 0:
             tile.neighbors.append(board[tile.rect.top - 1][tile.rect.left - 1])
-        else:
-            tile.neighbors.append(board[rows - 1][columns - 1])
         if tile.rect.left != columns - 1 and tile.rect.top != rows - 1:
             tile.neighbors.append(board[tile.rect.top + 1][tile.rect.left + 1])
-        else:
-            tile.neighbors.append(board[0][0])
         if tile.rect.left != 0 and tile.rect.top != rows - 1:
             tile.neighbors.append(board[tile.rect.top + 1][tile.rect.left - 1])
-        else:
-            tile.neighbors.append(board[0][columns - 1])
         if tile.rect.left != columns - 1 and tile.rect.top != 0:
             tile.neighbors.append(board[tile.rect.top - 1][tile.rect.left + 1])
-        else:
-            tile.neighbors.append(board[rows - 1][0])
 screen = pygame.display.set_mode((columns, rows), pygame.RESIZABLE)
 while True:
     for event in pygame.event.get():
@@ -71,12 +53,10 @@ while True:
                     live_neighbors += 1
                     if live_neighbors == 4:
                         break
-            if tile.state:
-                if live_neighbors not in (2, 3):
-                    tile.new_state = 0
-            else:
-                if live_neighbors == 3:
-                    tile.new_state = 1
+            if tile.state and live_neighbors not in (2, 3):
+                tile.new_state = 0
+            elif not tile.state and live_neighbors == 3:
+                tile.new_state = 1
     for row in board:
         for tile in row:
             tile.state = tile.new_state
