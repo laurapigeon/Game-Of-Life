@@ -82,34 +82,14 @@ class Board:
 
             self.tiles.append(row)
 
+        for row in self.tiles:
+            for tile in row:
+                tile.update_neighbors()
+
     def neighbor_check(self):
         for row in self.tiles:
             for tile in row:
-                x = tile.column
-                y = tile.row
-                neighbors = list()
-                # creates neighbors based on position of tile
-                if x != 0:
-                    neighbors.append(self.tiles[y][x - 1])
-                if x != self.columns - 1:
-                    neighbors.append(self.tiles[y][x + 1])
-
-                if y != 0:
-                    neighbors.append(self.tiles[y - 1][x])
-                if y != self.rows - 1:
-                    neighbors.append(self.tiles[y + 1][x])
-
-                if x != 0 and y != 0:
-                    neighbors.append(self.tiles[y - 1][x - 1])
-                if x != self.columns - 1 and y != self.rows - 1:
-                    neighbors.append(self.tiles[y + 1][x + 1])
-
-                if x != 0 and y != self.rows - 1:
-                    neighbors.append(self.tiles[y + 1][x - 1])
-                if x != self.columns - 1 and y != 0:
-                    neighbors.append(self.tiles[y - 1][x + 1])
-
-                tile.check_neighbors(neighbors)
+                tile.check_neighbors()
 
     def update_tiles(self):
         # append value to tile before changing tiles
@@ -147,6 +127,48 @@ class Tile:
         self.column = pos[0]
         self.row = pos[1]
 
+    def update_neighbors(self):
+        x = self.column
+        y = self.row
+        self.neighbors = list()
+        # creates neighbors based on position of tile
+
+        if WRAPPING:
+            bottom_x = (x - 1, self.board.columns - 1)[x == 0]
+            top_x = (x + 1, 0)[x == self.board.columns - 1]
+            bottom_y = (y - 1, self.board.rows - 1)[y == 0]
+            top_y = (y + 1, 0)[y == self.board.rows - 1]
+
+            self.neighbors.append(self.board.tiles[y][bottom_x])
+            self.neighbors.append(self.board.tiles[y][top_x])
+            self.neighbors.append(self.board.tiles[bottom_y][x])
+            self.neighbors.append(self.board.tiles[top_y][x])
+            self.neighbors.append(self.board.tiles[bottom_y][bottom_x])
+            self.neighbors.append(self.board.tiles[top_y][top_x])
+            self.neighbors.append(self.board.tiles[top_y][bottom_x])
+            self.neighbors.append(self.board.tiles[bottom_y][top_x])
+
+        else:
+            if x != 0:
+                self.neighbors.append(self.board.tiles[y][x - 1])
+            if x != self.board.columns - 1:
+                self.neighbors.append(self.board.tiles[y][x + 1])
+
+            if y != 0:
+                self.neighbors.append(self.board.tiles[y - 1][x])
+            if y != self.board.rows - 1:
+                self.neighbors.append(self.board.tiles[y + 1][x])
+
+            if x != 0 and y != 0:
+                self.neighbors.append(self.board.tiles[y - 1][x - 1])
+            if x != self.board.columns - 1 and y != self.board.rows - 1:
+                self.neighbors.append(self.board.tiles[y + 1][x + 1])
+
+            if x != 0 and y != self.board.rows - 1:
+                self.neighbors.append(self.board.tiles[y + 1][x - 1])
+            if x != self.board.columns - 1 and y != 0:
+                self.neighbors.append(self.board.tiles[y - 1][x + 1])
+
     def change_type(self, flip=False):
         if flip:  # for clicking on individual cells
             self.state = 1 - self.state
@@ -154,10 +176,10 @@ class Tile:
         else:  # for editing all cells at once
             self.state = self.new_state
 
-    def check_neighbors(self, neighbors):
+    def check_neighbors(self):
         # change state based on ruleset and living neighbors
         alive_neighbors = 0
-        for neighbor in neighbors:
+        for neighbor in self.neighbors:
             if neighbor.state == 1:
                 alive_neighbors += 1
 
@@ -224,8 +246,8 @@ class ScreenPrint:
 
 
 #region definitions
-TILE_DIMS = (10, 10)
-SCREEN_DIMS = (1080, 720)
+TILE_DIMS = (5, 5)
+SCREEN_DIMS = (1280, 720)
 board = Board(TILE_DIMS, SCREEN_DIMS)
 FIXED_DIMS = False
 
@@ -236,6 +258,7 @@ MAX_FRAMERATE = 30
 DEFAULT_SLOW_AMOUNT = 1
 slow_amount = DEFAULT_SLOW_AMOUNT
 
+WRAPPING = True
 RULES = [
         [[1, 3, 5, 7], [1, 3, 5, 7],                "Replicator",         "Replication"],
         [[1, 3, 5, 7], [0, 2, 4, 6, 8],             "Fredkin",            "Replication"],

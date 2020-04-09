@@ -1,2 +1,5 @@
 Frame screenshots
 Gif creation
+Panning and zooming
+Multiple types of neighborhood
+Optimisations
