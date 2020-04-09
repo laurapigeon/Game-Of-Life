@@ -45,12 +45,15 @@ class Board:
                 percentage_string = percentage
             mode_code = "b" + "".join([str(num) for num in RULES[mode][0]]) + "s" + "".join([str(num) for num in RULES[mode][1]])
             mode_string = "{}-Type Mode: {} ({})".format(RULES[mode][3], RULES[mode][2], mode_code)
-            open("population.txt", "w").write(dimensions_string + " " + percentage_string + " " + mode_string)
+            seed_string = "seed: {} {}".format(type(seed), seed)
+            open("population.txt", "w").write(dimensions_string + " " + percentage_string + " " + mode_string + " " + seed_string)
+
+        random.seed(None)  # for always random colour
 
         colour_combo = list(range(5))
         random.shuffle(colour_combo)
 
-        random.seed(seed)
+        random.seed(seed)  # user-entered seed
 
         for y in range(self.rows):
             row = []
