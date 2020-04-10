@@ -130,25 +130,24 @@ class Tile:
     def update_neighbors(self):
         x = self.column
         y = self.row
-        self.neighbors = list()
         # creates neighbors based on position of tile
-
         if WRAPPING:
             bottom_x = (x - 1, self.board.columns - 1)[x == 0]
             top_x = (x + 1, 0)[x == self.board.columns - 1]
             bottom_y = (y - 1, self.board.rows - 1)[y == 0]
             top_y = (y + 1, 0)[y == self.board.rows - 1]
 
-            self.neighbors.append(self.board.tiles[y][bottom_x])
-            self.neighbors.append(self.board.tiles[y][top_x])
-            self.neighbors.append(self.board.tiles[bottom_y][x])
-            self.neighbors.append(self.board.tiles[top_y][x])
-            self.neighbors.append(self.board.tiles[bottom_y][bottom_x])
-            self.neighbors.append(self.board.tiles[top_y][top_x])
-            self.neighbors.append(self.board.tiles[top_y][bottom_x])
-            self.neighbors.append(self.board.tiles[bottom_y][top_x])
+            self.neighbors = [self.board.tiles[y][bottom_x],
+                              self.board.tiles[y][top_x],
+                              self.board.tiles[bottom_y][x],
+                              self.board.tiles[top_y][x],
+                              self.board.tiles[bottom_y][bottom_x],
+                              self.board.tiles[top_y][top_x],
+                              self.board.tiles[top_y][bottom_x],
+                              self.board.tiles[bottom_y][top_x]]
 
         else:
+            self.neighbors = list()
             if x != 0:
                 self.neighbors.append(self.board.tiles[y][x - 1])
             if x != self.board.columns - 1:
@@ -246,15 +245,15 @@ class ScreenPrint:
 
 
 #region definitions
-TILE_DIMS = (5, 5)
+TILE_DIMS = (1, 1)
 SCREEN_DIMS = (1280, 720)
 board = Board(TILE_DIMS, SCREEN_DIMS)
 FIXED_DIMS = False
 
-DISPLAY_TEXT = True
+DISPLAY_TEXT = False
 OUTPUT_TO_FILE = "value"  # None, "value" or "percentage"
 
-MAX_FRAMERATE = 30
+MAX_FRAMERATE = 60
 DEFAULT_SLOW_AMOUNT = 1
 slow_amount = DEFAULT_SLOW_AMOUNT
 
@@ -280,7 +279,7 @@ DEFAULT_MODE = 7
 mode = DEFAULT_MODE
 
 COLOUR = True
-SEED = 44
+SEED = "nyaaa"
 board.populate(0, seed=SEED)
 
 FONT = pygame.font.SysFont("Calibri", round(board.get_size()[1] / 20))
