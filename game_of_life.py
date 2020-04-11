@@ -245,19 +245,19 @@ class ScreenPrint:
 
 
 #region definitions
-TILE_DIMS = (1, 1)
-SCREEN_DIMS = (1280, 720)
+TILE_DIMS = (1, 1)  # the dimensions of each tile
+SCREEN_DIMS = (1280, 720)  # the dimensions of the screen
 board = Board(TILE_DIMS, SCREEN_DIMS)
-FIXED_DIMS = False
+FIXED_DIMS = False  # whether resising the window resizes the board (board resizes to screen when repopulated)
 
-DISPLAY_TEXT = False
-OUTPUT_TO_FILE = "value"  # None, "value" or "percentage"
+DISPLAY_TEXT = True  # whether to display text on screen
+OUTPUT_TO_FILE = "value"  # None, "value" or "percentage" appended to population.txt when the program is run
 
-MAX_FRAMERATE = 60
-DEFAULT_SLOW_AMOUNT = 1
+MAX_FRAMERATE = 60  # maximum framerate the program runs at
+DEFAULT_SLOW_AMOUNT = 1  # fraction of the max framerate the program runs at
 slow_amount = DEFAULT_SLOW_AMOUNT
 
-WRAPPING = True
+WRAPPING = True  # maps the screen onto a torus (left-right and top-bottom wrapping)
 RULES = [
         [[1, 3, 5, 7], [1, 3, 5, 7],                "Replicator",         "Replication"],
         [[1, 3, 5, 7], [0, 2, 4, 6, 8],             "Fredkin",            "Replication"],
@@ -274,15 +274,15 @@ RULES = [
         [[3],          [1, 2],                      "Flock",              "Life"],
         [[3, 6],       [1, 2, 5],                   "2x2",                "Life"],
         [[3, 6, 7, 8], [3, 4, 6, 7, 8],             "Day & Night",        "Life"]
-]
-DEFAULT_MODE = 7
+]  # possible sets of rules coded in
+DEFAULT_MODE = 7  # default rule of the program
 mode = DEFAULT_MODE
 
-COLOUR = True
-SEED = "nyaaa"
+COLOUR = True  # random tile colour distribution
+SEED = "nyaaa"  # seed to generate the random starting population
 board.populate(0, seed=SEED)
 
-FONT = pygame.font.SysFont("Calibri", round(board.get_size()[1] / 20))
+FONT = pygame.font.SysFont("Calibri", round(board.get_size()[1] / 20))  # font for screen text
 text_surface = None
 
 pygame.display.set_caption("The Game of Life")

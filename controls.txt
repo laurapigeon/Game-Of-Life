@@ -1,0 +1,13 @@
+Controls for game_of_life.py
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Number keys 0-9 and letters c, e, and l:
+Populate the board randomly with a percentage (0-9) or by a pattern.
+c -> checkerboard, e -> edges, l -> lines
+
+Space - Pause/Play
+-/+ - Decrease or increase framerate (as a fraction of the max framerate)
+return (when paused) - Frame advance
+</> - Change mode/ruleset (default mode is conways game of life)
+
+Left Click - Flip current cell under mouse cursor
