@@ -320,16 +320,16 @@ while not done:
                 text_surface = ScreenPrint.get_surface("Frame advanced", "bottomright", frame)
 
             # change fraction of max framerate
-            if event.key in (pygame.K_PERIOD, pygame.K_COMMA):
-                if event.unicode == "." and slow_amount > 1.5:
+            if event.key in (pygame.K_EQUALS, pygame.K_MINUS):
+                if event.unicode == "=" and slow_amount > 1.5:
                     slow_amount -= 1
-                elif event.unicode == "," and slow_amount < MAX_FRAMERATE - 0.5:
+                elif slow_amount < MAX_FRAMERATE - 0.5:
                     slow_amount += 1
                 text_surface = ScreenPrint.get_surface("{} frames per second".format(round(MAX_FRAMERATE / slow_amount, 1)), "bottomright", frame)
 
             # change mode
-            if event.key in (pygame.K_EQUALS, pygame.K_MINUS):
-                if event.unicode == "=":
+            if event.key in (pygame.K_PERIOD, pygame.K_COMMA):
+                if event.unicode == ".":
                     mode += 1
                 else:
                     mode -= 1
