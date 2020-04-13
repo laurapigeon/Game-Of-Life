@@ -3,3 +3,4 @@ Gif creation
 Panning and zooming
 Multiple types of neighborhood
 Optimisations
+Save states

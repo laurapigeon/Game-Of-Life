@@ -326,7 +326,7 @@ while not done:
             if event.key in (pygame.K_EQUALS, pygame.K_MINUS):
                 if event.unicode == "=" and slow_amount > 1.5:
                     slow_amount -= 1
-                elif slow_amount < MAX_FRAMERATE - 0.5:
+                elif event.unicode == "-" and slow_amount < MAX_FRAMERATE - 0.5:
                     slow_amount += 1
                 text_surface = ScreenPrint.get_surface("{} frames per second".format(round(MAX_FRAMERATE / slow_amount, 1)), "bottomright", frame)
 
@@ -362,7 +362,7 @@ while not done:
     #endregion
 
     # reduce calculations to every n frames
-    if frame % slow_amount != 0:
+    if frame % slow_amount != 0 or slow_amount == 1:
         screen.fill((0, 0, 0))
         board.draw(screen)
         board.draw_tiles(screen)
@@ -373,7 +373,7 @@ while not done:
         ScreenPrint.display_surface(ScreenPrint.get_surface(str(board.generation), "bottomleft", print_string=False), board)
 
         pygame.display.flip()
-    elif not pause:
+    if (frame % slow_amount != 0 or slow_amount == 1) and not pause:
         board.neighbor_check()
         board.update_tiles()
         # cap framerate to avoid lagging
