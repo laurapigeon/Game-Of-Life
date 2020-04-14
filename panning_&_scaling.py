@@ -19,26 +19,29 @@ class Board:
         self.grid = grid
         self.update_dims("dims")
         self.offset = offset
+        self.update_rect()
         self.colour = colour
 
     def set_value(self, key_value_pair, fix_key=None, change=False):
-        try:
-            if change:
-                self.__dict__[key_value_pair[0]] += key_value_pair[1]
-            else:
-                self.__dict__[key_value_pair[0]] = key_value_pair[1]
-            if key_value_pair[0] == "tile_dims":
-                self.update_tile_rects()
-            elif key_value_pair[0] == "grid":
-                self.populate()
+        if change:
+            new_value = self.__dict__[key_value_pair[0]] + key_value_pair[1]
+        else:
+            new_value = key_value_pair[1]
+
+        if new_value.x <= 0 or new_value.y <= 0:
+            print("Could not {} {} {} {}.".format(("set", "change")[change], key_value_pair[0], ("to", "by")[change], key_value_pair[1]))
+        else:
+            self.__dict__[key_value_pair[0]] = new_value
             keys = ["grid", "dims", "tile_dims"]
             if key_value_pair[0] in keys and fix_key in keys:
                 keys.remove(key_value_pair[0])
                 keys.remove(fix_key)
                 self.update_dims(keys[0])
             self.update_rect()
-        except:
-            print("Could not {} {} {} {}.".format(("set", "change")[change], key_value_pair[0], ("to", "by")[change], key_value_pair[1]))
+            if key_value_pair[0] == "tile_dims":
+                self.update_tile_rects()
+            elif key_value_pair[0] == "grid":
+                self.populate()
 
     def update_tile_rects(self):
         for row in self.tiles:
@@ -71,7 +74,7 @@ class Board:
         for row_num in range(int(self.grid.y)):
             row = list()
             for column_num in range(int(self.grid.x)):
-                row.append(Tile(self, 0, Vector(column_num, row_num), (random.randint(128, 192), random.randint(128, 192), random.randint(128, 192))))
+                row.append(Tile(self, 1, Vector(column_num, row_num), (random.randint(128, 192), random.randint(128, 192), random.randint(128, 192))))
             self.tiles.append(row)
 
     def draw(self):
@@ -79,7 +82,7 @@ class Board:
         pygame.draw.rect(self.surface, self.colour, self.rect_on_self)
         for row in self.tiles:
             for tile in row:
-                pygame.draw.rect(self.surface, tile.colour, tile.rect)
+                tile.draw()
         self.parent.blit(self.surface, self.rect_on_parent.topleft)
 
 
@@ -92,12 +95,24 @@ class Tile:
         self.colour = colour
 
     def update_rect(self):
+        parent_rect = self.board.parent.get_rect()
+        parent_dims = Vector(parent_rect.size)
         rect_top_left = v_round(self.pos * self.board.tile_dims.elementwise())
         rect_dims = v_round(self.board.tile_dims)
-        self.rect = pygame.Rect(rect_top_left, rect_dims)
+        screen_rect_top_left = self.board.rect_on_parent.move(rect_top_left).topleft
+        self.rect_on_screen = pygame.Rect(screen_rect_top_left, rect_dims)
+        self.rect_on_board = pygame.Rect(rect_top_left, rect_dims)
+
+    def draw(self):
+        if self.state == 1:
+            #print(self.rect_on_screen, self.board.parent.get_rect())
+            within_x = self.rect_on_screen.right >= 0 and self.rect_on_screen.left <= self.board.parent.get_rect().right
+            within_y = self.rect_on_screen.bottom >= 0 and self.rect_on_screen.top <= self.board.parent.get_rect().bottom
+            if within_x and within_y:
+                pygame.draw.rect(self.board.surface, self.colour, self.rect_on_board)
 
 
-board = Board(screen, Vector(10, 10), Vector(10, 10))
+board = Board(screen, tile_dims=Vector(10, 10), grid=Vector(15, 15))
 board.populate()
 # grid (columns/rows), tile_dims (width/height), dims (width/height) (any two of the 3 for a desired effect)
 # board.set_value(("key_to_change", value), "key_to_fix", True)
@@ -113,6 +128,7 @@ while not done:
         elif event.type == pygame.VIDEORESIZE:
             screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
             board.update_rect()
+            board.update_tile_rects()
 
         elif event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_EQUALS, pygame.K_MINUS):
@@ -140,6 +156,7 @@ while not done:
             delta_mouse = pygame.mouse.get_rel()
             board.offset += Vector(delta_mouse) / board.tile_dims.elementwise()
             board.update_rect()
+            board.update_tile_rects()
 
     screen.fill((0, 0, 0))
     board.draw()
