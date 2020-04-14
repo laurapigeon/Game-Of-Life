@@ -54,7 +54,7 @@ class Board:
     def update_rect(self):
         parent_dims = Vector(self.parent.get_rect().size)
         board_top_left = v_round(self.borders / 2 * self.tile_dims.elementwise())
-        rect_top_left = v_round(parent_dims / 2 + self.offset * self.tile_dims.elementwise() - self.dims / 2 - self.borders / 2 * self.tile_dims.elementwise())
+        rect_top_left = v_round((parent_dims - self.dims) / 2 + (self.offset - self.borders / 2) * self.tile_dims.elementwise())
         board_dims = v_round(self.dims)
         rect_dims = v_round(self.dims + self.borders * self.tile_dims.elementwise())
 
@@ -99,10 +99,10 @@ class Tile:
 
     def update_rect(self):
         if self.board.tile_dims.x > 6 and self.board.tile_dims.y > 6 and TILE_BORDERS:  # for pixel cell border
-            rect_top_left = v_round(Vector(1, 1) + self.pos * self.board.tile_dims.elementwise() + self.board.borders / 2 * self.board.tile_dims.elementwise())
+            rect_top_left = v_round((Vector(1, 1) + self.pos + self.board.borders / 2) * self.board.tile_dims.elementwise())
             rect_dims = v_round(Vector(-2, -2) + self.board.tile_dims)
         else:
-            rect_top_left = v_round(self.pos * self.board.tile_dims.elementwise() + self.board.borders / 2 * self.board.tile_dims.elementwise())
+            rect_top_left = v_round((self.pos + self.board.borders / 2) * self.board.tile_dims.elementwise())
             rect_dims = v_round(self.board.tile_dims)
 
         screen_rect_top_left = self.board.rect_on_parent.move(rect_top_left).topleft  # tile rect relative to screen
