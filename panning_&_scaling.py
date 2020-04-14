@@ -5,7 +5,7 @@ pygame.init()
 
 
 class Board:
-    def __init__(self, parent, tile_dims, grid, offset=Vector(0, 0), colour=(100, 100, 100)):
+    def __init__(self, parent, tile_dims, grid, borders=Vector(0, 0), offset=Vector(0, 0), colour=(100, 100, 100), border_colour=(200, 200, 200)):
         self.parent = parent  # the surface the board is on
 
         self.tile_dims = tile_dims
@@ -13,10 +13,12 @@ class Board:
         self.update_dims("dims")  # creates the dims attribute
 
         self.populate()  # fills the board with tiles
+        self.borders = borders
         self.offset = offset
         self.update_rect()  # gives the board and tiles attributes for drawing
 
         self.colour = colour
+        self.border_colour = border_colour
 
     def set_value(self, key_value_pair, fix_key=None, change=False):
         if change:
@@ -24,12 +26,14 @@ class Board:
         else:
             new_value = key_value_pair[1]
 
-        if new_value.x <= 0 or new_value.y <= 0:  # values of 0 or below produce error
+        keys = ["grid", "dims", "tile_dims"]  # possible changes to the graphics of the board
+        outbound_dims = key_value_pair[0] in keys and (new_value.x <= 0 or new_value.y <= 0)  # values of 0 or below produce error
+        outbound_borders = key_value_pair[0] == "borders" and (new_value.x < 0 or new_value.y < 0)  # values below 0 not wanted
+        if outbound_dims or outbound_borders:
             wordset = (("set", "to"), ("change", "by"))[change]
             print("Could not {} {} {} {}.".format(wordset[0], key_value_pair[0], wordset[1], key_value_pair[1]))
         else:
             self.__dict__[key_value_pair[0]] = new_value
-            keys = ["grid", "dims", "tile_dims"]  # possible changes to the graphics of the board
             if key_value_pair[0] in keys and fix_key in keys:  # all keys
                 keys.remove(key_value_pair[0])  # - changed key
                 keys.remove(fix_key)  # - fixed key
@@ -49,11 +53,13 @@ class Board:
 
     def update_rect(self):
         parent_dims = Vector(self.parent.get_rect().size)
-        rect_top_left = v_round(parent_dims / 2 + self.offset * self.tile_dims.elementwise() - self.dims / 2)
-        rect_dims = v_round(self.dims)
+        board_top_left = v_round(self.borders / 2 * self.tile_dims.elementwise())
+        rect_top_left = v_round(parent_dims / 2 + self.offset * self.tile_dims.elementwise() - self.dims / 2 - self.borders / 2 * self.tile_dims.elementwise())
+        board_dims = v_round(self.dims)
+        rect_dims = v_round(self.dims + self.borders * self.tile_dims.elementwise())
 
         self.rect_on_parent = pygame.Rect(rect_top_left, rect_dims)  # rect for blitting board surface onto parent
-        self.rect_on_self = pygame.Rect((0, 0), rect_dims)  # rect for drawing board
+        self.rect_on_self = pygame.Rect(board_top_left, board_dims)  # rect for drawing board
         self.surface = pygame.Surface(rect_dims)  # surface for drawing tiles
 
         self.update_tile_rects()  # mark tiles on board for rect updates
@@ -73,8 +79,8 @@ class Board:
             self.tiles.append(row)
 
     def draw(self):
-        self.surface.fill(self.colour)  # method one for displaying board
-        pygame.draw.rect(self.surface, self.colour, self.rect_on_self)  # method two for displaying board
+        self.surface.fill(self.border_colour)  # borders outside rect_on_self area
+        pygame.draw.rect(self.surface, self.colour, self.rect_on_self)  # area covered by tiles
 
         for row in self.tiles:
             for tile in row:
@@ -92,11 +98,11 @@ class Tile:
         self.colour = colour
 
     def update_rect(self):
-        if self.board.tile_dims.x > 5 and self.board.tile_dims.y > 5 and BORDERS:  # for pixel cell border
-            rect_top_left = v_round(Vector(1, 1) + self.pos * self.board.tile_dims.elementwise())
+        if self.board.tile_dims.x > 5 and self.board.tile_dims.y > 5 and TILE_BORDERS:  # for pixel cell border
+            rect_top_left = v_round(Vector(1, 1) + self.pos * self.board.tile_dims.elementwise() + self.board.borders / 2 * self.board.tile_dims.elementwise())
             rect_dims = v_round(Vector(-2, -2) + self.board.tile_dims)
         else:
-            rect_top_left = v_round(self.pos * self.board.tile_dims.elementwise())
+            rect_top_left = v_round(self.pos * self.board.tile_dims.elementwise() + self.board.borders / 2 * self.board.tile_dims.elementwise())
             rect_dims = v_round(self.board.tile_dims)
 
         screen_rect_top_left = self.board.rect_on_parent.move(rect_top_left).topleft  # tile rect relative to screen
@@ -124,9 +130,9 @@ def v_round(vector):  # takes a Vector instance and returns a rounded tuple
 DEFUAULT_SCREEN_DIMS = (500, 500)
 screen = pygame.display.set_mode(DEFUAULT_SCREEN_DIMS, pygame.RESIZABLE)
 
-BORDERS = False
+TILE_BORDERS = True
 
-board = Board(screen, tile_dims=Vector(10, 10), grid=Vector(105, 105))
+board = Board(screen, tile_dims=Vector(10, 10), grid=Vector(105, 105), borders=Vector(2, 2))
 board.populate()
 # grid (columns/rows), tile_dims (width/height), dims (width/height) (any two of the 3 for a desired effect)
 # board.set_value(("key_to_change", value), "key_to_fix", change=True)
@@ -141,14 +147,20 @@ while not done:
 
         elif event.type == pygame.VIDEORESIZE:  # screen resize by dragging edges of window
             screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
-            board.update_rect()
+            board.update_rect()  # board.set_value() not needed as board.parent is dynamic
 
         elif event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_EQUALS, pygame.K_MINUS):  # change number of rows and columns
                 if event.key == pygame.K_EQUALS:
-                    board.set_value(("grid", Vector(10, 10)), "tile_dims", True)
+                    board.set_value(("grid", Vector(10, 10)), "tile_dims", change=True)
                 elif event.key == pygame.K_MINUS:
-                    board.set_value(("grid", Vector(-10, -10)), "tile_dims", True)
+                    board.set_value(("grid", Vector(-10, -10)), "tile_dims", change=True)
+
+            if event.key in (pygame.K_PERIOD, pygame.K_COMMA):  # change border widths
+                if event.key == pygame.K_PERIOD:
+                    board.set_value(("borders", Vector(2, 2)), change=True)
+                elif event.key == pygame.K_COMMA:
+                    board.set_value(("borders", Vector(-2, -2)), change=True)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:  # begin dragging board
             if event.button == 1:
@@ -157,17 +169,16 @@ while not done:
 
             elif event.button in (4, 5):  # zoom board (by changing tile dimensions)
                 if event.button == 4:
-                    board.set_value(("tile_dims", Vector(1, 1)), "grid", True)
+                    board.set_value(("tile_dims", Vector(1, 1)), "grid", change=True)
                 elif event.button == 5:
-                    board.set_value(("tile_dims", Vector(-1, -1)), "grid", True)
+                    board.set_value(("tile_dims", Vector(-1, -1)), "grid", change=True)
 
         elif event.type == pygame.MOUSEBUTTONUP:  # end dragging board
             if event.button == 1:
                 left_click_held = False
 
         elif event.type == pygame.MOUSEMOTION and left_click_held:  # append relative mouse motion to board offset
-            board.offset += Vector(pygame.mouse.get_rel()) / board.tile_dims.elementwise()
-            board.update_rect()
+            board.set_value(("offset", Vector(pygame.mouse.get_rel()) / board.tile_dims.elementwise()), change=True)
 
     screen.fill((0, 0, 0))
     board.draw()
