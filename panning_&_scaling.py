@@ -51,9 +51,11 @@ class Board:
         parent_dims = Vector(self.parent.get_rect().size)
         rect_top_left = v_round(parent_dims / 2 + self.offset * self.tile_dims.elementwise() - self.dims / 2)
         rect_dims = v_round(self.dims)
+
         self.rect_on_parent = pygame.Rect(rect_top_left, rect_dims)  # rect for blitting board surface onto parent
         self.rect_on_self = pygame.Rect((0, 0), rect_dims)  # rect for drawing board
         self.surface = pygame.Surface(rect_dims)  # surface for drawing tiles
+
         self.update_tile_rects()  # mark tiles on board for rect updates
 
     def update_tile_rects(self):
@@ -73,9 +75,11 @@ class Board:
     def draw(self):
         self.surface.fill(self.colour)  # method one for displaying board
         pygame.draw.rect(self.surface, self.colour, self.rect_on_self)  # method two for displaying board
+
         for row in self.tiles:
             for tile in row:
                 tile.draw()  # draw tiles on board
+
         self.parent.blit(self.surface, self.rect_on_parent.topleft)  # blit board onto surface
 
 
@@ -94,15 +98,19 @@ class Tile:
         else:
             rect_top_left = v_round(self.pos * self.board.tile_dims.elementwise())
             rect_dims = v_round(self.board.tile_dims)
+
         screen_rect_top_left = self.board.rect_on_parent.move(rect_top_left).topleft  # tile rect relative to screen
+
         self.rect_on_screen = pygame.Rect(screen_rect_top_left, rect_dims)  # for detecting if on screen
         self.rect_on_board = pygame.Rect(rect_top_left, rect_dims)  # for drawing cells on board
+
         self.due_rect_update = False  # done updating rect
 
     def draw(self):
         if self.state == 1:
             if self.due_rect_update:
                 self.update_rect()  # update rects that need it before theyre drawn
+
             within_x = self.rect_on_screen.right >= 0 and self.rect_on_screen.left <= self.board.parent.get_rect().right
             within_y = self.rect_on_screen.bottom >= 0 and self.rect_on_screen.top <= self.board.parent.get_rect().bottom
             if within_x and within_y:  # tile is only drawn to board if on screen
