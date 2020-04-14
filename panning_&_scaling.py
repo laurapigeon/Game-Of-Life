@@ -98,7 +98,7 @@ class Tile:
         self.colour = colour
 
     def update_rect(self):
-        if self.board.tile_dims.x > 5 and self.board.tile_dims.y > 5 and TILE_BORDERS:  # for pixel cell border
+        if self.board.tile_dims.x > 6 and self.board.tile_dims.y > 6 and TILE_BORDERS:  # for pixel cell border
             rect_top_left = v_round(Vector(1, 1) + self.pos * self.board.tile_dims.elementwise() + self.board.borders / 2 * self.board.tile_dims.elementwise())
             rect_dims = v_round(Vector(-2, -2) + self.board.tile_dims)
         else:
