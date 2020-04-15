@@ -89,17 +89,25 @@ class Board:
             for tile in row:
                 tile.check_neighbors()
 
-    def populate(self, percentage, seed=None):
-        self.tiles = list()
+    def update_ants(self):
+        for ant in self.ants:
+            ant.update()
+
+    def populate(self, percentage, ant_rules=[], seed=None):
 
         random.seed(seed)
 
+        self.ants = list()
+        for i in range(len(ant_rules)):
+            facing = (Vector(1, 0), Vector(0, -1), Vector(-1, 0), Vector(0, 1))[random.randint(0, 3)]
+            self.ants.append(Ant(self, facing, Vector(random.randint(0, self.grid.x - 1), random.randint(0, self.grid.y - 1)), random.randint(0, 5), ant_rules[i]))
+
+        self.tiles = list()
         for row_num in range(int(self.grid.y)):
             row = list()
             for column_num in range(int(self.grid.x)):
                 state = random.random() < percentage
-                pos = Vector(column_num, row_num)
-                row.append(Tile(self, state, pos))
+                row.append(Tile(self, state, Vector(column_num, row_num)))
             self.tiles.append(row)
 
         if seed is not None:
@@ -117,6 +125,8 @@ class Board:
 
         self.draw_tiles()
 
+        self.draw_ants()
+
         self.due_draw = False
 
     def blit(self):
@@ -127,12 +137,15 @@ class Board:
             for tile in row:
                 tile.draw()  # draw tiles on board
 
+    def draw_ants(self):
+        for ant in self.ants:
+            ant.draw()
+
 
 class Tile:
     def __init__(self, board, initial_state, pos, colour=(255, 255, 255)):
         self.board = board
         self.state = initial_state
-        self.age = 0
         self.pos = pos  # position in grid
         self.due_rect_update = True  # due to have rect updated
         self.due_draw = False
@@ -209,14 +222,46 @@ class Tile:
             self.due_draw = False
 
 
+class Ant:
+    colours = ((164, 255, 164), (255, 255, 164), (255, 164, 164), (255, 164, 255), (164, 164, 255), (164, 255, 255))
+
+    def __init__(self, board, facing, pos, colour, rules):
+        self.board = board
+        self.facing = facing
+        self.pos = pos
+        self.colour = self.colours[colour]
+        self.rules = rules
+
+    def update(self):
+        tile = self.board.tiles[int(self.pos.y)][int(self.pos.x)]
+        self.facing.rotate_ip(self.rules[tile.state])
+        tile.state = 1 - tile.state
+        tile.draw()
+        self.move()
+        self.draw()
+
+    def move(self):
+        self.pos += self.facing
+        self.pos %= self.board.grid.elementwise()
+
+    def get_rect(self):
+        rect_top_left = v_round((self.pos + self.board.borders / 2) * self.board.tile_dims.elementwise())
+        rect_dims = v_round(self.board.tile_dims)
+        return pygame.Rect(rect_top_left, rect_dims)  # for drawing cells on board
+
+    def draw(self):
+        pygame.draw.rect(self.board.surface, (255, 0, 0), self.get_rect())
+
+
 def v_round(vector):  # takes a Vector instance and returns a rounded tuple
     return (round(vector.x), round(vector.y))
 
 
-DEFUAULT_SCREEN_DIMS = (500, 500)
+DEFUAULT_SCREEN_DIMS = (1920, 1030)
 screen = pygame.display.set_mode(DEFUAULT_SCREEN_DIMS, pygame.RESIZABLE)
+clock = pygame.time.Clock()
 
-TILE_BORDERS = True
+TILE_BORDERS = False
 SEED = None
 
 RULES = [
@@ -236,10 +281,10 @@ RULES = [
         [[3, 6],       [1, 2, 5],                   "2x2",                "Life"],
         [[3, 6, 7, 8], [3, 4, 6, 7, 8],             "Day & Night",        "Life"]
 ]  # possible sets of rules coded in
-DEFAULT_MODE = 7  # default rule of the program
+DEFAULT_MODE = 14  # default rule of the program
 mode = DEFAULT_MODE
 
-board = Board(screen, tile_dims=Vector(10, 10), grid=Vector(105, 105), borders=Vector(2, 2))
+board = Board(screen, tile_dims=Vector(5, 5), grid=Vector(382, 206), borders=Vector(2, 2))
 board.populate(0)
 
 # grid (columns/rows), tile_dims (width/height), dims (width/height) (any two of the 3 for a desired effect)
@@ -279,7 +324,11 @@ while not done:
                 mode %= len(RULES)
 
             if event.unicode in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]:
-                board.populate(int(event.unicode) / 10, seed=SEED)
+                ants = list()
+                for i in range(100):
+                    ants.append((0, 90))
+                    ants.append((90, 0))
+                board.populate(int(event.unicode) / 10, ants, seed=SEED)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:  # begin dragging board
             if event.button == 1:
@@ -309,3 +358,6 @@ while not done:
 
     board.check_tile_neighbors()
     board.update_tile_states()
+    board.update_ants()
+
+    clock.tick(60)
