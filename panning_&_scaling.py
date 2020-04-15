@@ -15,7 +15,7 @@ class Board:
         self.populate()  # fills the board with tiles
         self.borders = borders
         self.offset = offset
-        self.update_rect()  # gives the board and tiles attributes for drawing
+        self.due_rect_update = True  # gives the board and tiles attributes for drawing
 
         self.colour = colour
         self.border_colour = border_colour
@@ -38,7 +38,7 @@ class Board:
                 keys.remove(key_value_pair[0])  # - changed key
                 keys.remove(fix_key)  # - fixed key
                 self.update_dims(keys[0])  # = key to be changed to account for new value
-            self.update_rect()  # update rects to account for changes
+            self.due_rect_update = True  # update rects to account for changes
             if key_value_pair[0] == "grid":
                 self.populate()  # newly populate grid if the number of rows or columns changes
 
@@ -64,6 +64,8 @@ class Board:
 
         self.update_tile_rects()  # mark tiles on board for rect updates
 
+        self.due_rect_update = False  # done updating rect
+
     def update_tile_rects(self):
         for row in self.tiles:
             for tile in row:
@@ -79,6 +81,8 @@ class Board:
             self.tiles.append(row)
 
     def draw(self):
+        if self.due_rect_update:
+            board.update_rect()  # update rect if needed before drawn
         self.surface.fill(self.border_colour)  # borders outside rect_on_self area
         pygame.draw.rect(self.surface, self.colour, self.rect_on_self)  # area covered by tiles
 
@@ -147,7 +151,7 @@ while not done:
 
         elif event.type == pygame.VIDEORESIZE:  # screen resize by dragging edges of window
             screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
-            board.update_rect()  # board.set_value() not needed as board.parent is dynamic
+            board.due_rect_update = True  # board.set_value() not needed as board.parent is dynamic
 
         elif event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_EQUALS, pygame.K_MINUS):  # change number of rows and columns
