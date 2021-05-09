@@ -325,9 +325,10 @@ while not done:
 
             if event.unicode in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]:
                 ants = list()
-                for i in range(100):
-                    ants.append((0, 90))
-                    ants.append((90, 0))
+                if keys_pressed[pygame.K_LSHIFT]:
+                    for i in range(100):
+                        ants.append((0, 90))
+                        ants.append((90, 0))
                 board.populate(int(event.unicode) / 10, ants, seed=SEED)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:  # begin dragging board
