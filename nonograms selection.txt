@@ -1,0 +1,2 @@
+if click on own colour   -> remove all of own colour dragged over on row
+if click on other colour -> replace empty tiles with own colour on row
