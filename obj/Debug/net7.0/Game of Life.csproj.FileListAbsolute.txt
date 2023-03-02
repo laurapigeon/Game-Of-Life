@@ -1,0 +1,15 @@
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\obj\Debug\net7.0\Game of Life.csproj.AssemblyReference.cache
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\obj\Debug\net7.0\Game of Life.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\obj\Debug\net7.0\Game of Life.AssemblyInfoInputs.cache
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\obj\Debug\net7.0\Game of Life.AssemblyInfo.cs
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\obj\Debug\net7.0\Game of Life.csproj.CoreCompileInputs.cache
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\bin\Debug\net7.0\Game of Life.exe
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\bin\Debug\net7.0\Game of Life.deps.json
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\bin\Debug\net7.0\Game of Life.runtimeconfig.json
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\bin\Debug\net7.0\Game of Life.dll
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\bin\Debug\net7.0\Game of Life.pdb
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\obj\Debug\net7.0\Game of Life.dll
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\obj\Debug\net7.0\refint\Game of Life.dll
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\obj\Debug\net7.0\Game of Life.pdb
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\obj\Debug\net7.0\Game of Life.genruntimeconfig.cache
+C:\Users\Laura\Documents\LAURASSTICKMEMORIAL\Codes\Game of Life\obj\Debug\net7.0\ref\Game of Life.dll
